@@ -1,0 +1,41 @@
+description: Checks whether the local and remote dashboards are equal. Exports 'NEW_VERSION' to env
+parameters:
+  dashboard-name:
+    type: string
+    default: dashboard
+    description: |
+      Name of the json(net) dashboard file. It is assumed that they share the same name.
+      Defaults to 'dashboard'.
+  dashboard-path:
+    type: string
+    default: monitoring
+    description: |
+      Specify the path to where json dashboard is available. Omit any trailing /.
+      Defaults to 'monitoring'.
+steps:
+  - run:
+      name: Check if remote and local dashboards differs
+      working_directory: <<parameters.dashboard-path>>
+      command: |
+        DASH_UID="$(cat <<parameters.dashboard-name>>.json | jq ".uid" | sed 's/\"//g' )"
+        echo "Looking for dashboard with id '$DASH_UID'"
+        HTTP_CODE=$(curl "$GRAFANA_DASHBOARDS_HOST/api/dashboards/uid/$DASH_UID" \
+          -H "Authorization: Bearer $GRAFANA_DASHBOARDS_KEY" \
+          -H "Content-type: application/json" \
+          -o tmp.json -w "%{http_code}"
+        )
+
+        if [ "$HTTP_CODE" == "200" ]; then
+          echo "Previous version found. Checking for differences"
+          cat tmp.json | jq -r ".dashboard" > dashboard_external.json
+
+          # Exit status is 0 if inputs are the same, 1 if different, 2 if trouble.
+          DIFF="$(! diff -w -I "version" -I "id" dashboard_external.json <<parameters.dashboard-name>>.json || :)"
+          DASH_DIFF=$?
+          echo "Diff: $DIFF"
+
+          echo "export NEW_VERSION=\"$DASH_DIFF\"" >> $BASH_ENV
+        else
+          echo "No previous version found. Proceeding to upload"
+          echo "export NEW_VERSION=0" >> $BASH_ENV
+        fi

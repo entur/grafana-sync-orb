@@ -1,0 +1,9 @@
+usage:
+  version: 2.1
+  orbs:
+    grafana: entur/grafana-sync@0.0.9
+  workflows:
+    use-my-orb:
+      jobs:
+        - grafana/sync:
+            folder-uid: SOME_ID

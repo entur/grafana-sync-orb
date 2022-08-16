@@ -1,0 +1,80 @@
+description: |
+  Upload a dashboard in json format to Grafana.
+
+  The dashboard is only uploaded if the local and remote versions differ.
+  The dashboard is uploaded to the folder specified by folder-uid. If a dashboard with the same name/uid exists, it will be overwritten.
+  Grafana host should be specified in $GRAFANA_DASHBOARDS_HOST, and the api-token in $GRAFANA_DASHBOARDS_KEY.
+executor: default
+parameters:
+  dashboard-name:
+    type: string
+    default: dashboard
+    description: |
+      Name of the json(net) dashboard file. It is assumed that they share the same name.
+      Defaults to 'dashboard'.
+  dashboard-path:
+    type: string
+    default: monitoring
+    description: |
+      Specify the path to where json dashboard is available. Omit any trailing /.
+      Defaults to 'monitoring'.
+  folder-uid:
+    type: string
+    description: |
+      Folder uid from Grafana.
+      Uid can be taken from 'HOST/dashboards/f/{UID}'
+  overwrite-existing:
+    type: boolean
+    default: true
+    description: |
+      Whether to overwrite existing dashboard matching name/uid.
+      Defaults to 'true'.
+  autoupdate:
+    type: boolean
+    default: true
+    description: |
+      Whether to automatically update the generated dashboard in case of library or config updates.
+      Config *must* be in a .libsonnet-file matching the name given in the dashboard-name parameter.
+      Defaults to 'true'.
+steps:
+  - checkout
+  - attach_workspace:
+      at: "."
+  - run:
+      name: Validate input
+      command: |
+        echo "Verifying input"
+        if [ ! -s "<<parameters.dashboard-path>>/<<parameters.dashboard-name>>.json" ]; then
+          echo "File <<parameters.dashboard-path>>/<<parameters.dashboard-name>>.json does not exist or was empty"
+          exit 1
+        fi
+        if [ -z "<<parameters.folder-uid>>" ]; then
+          echo "Folder uid is required!"
+          exit 1
+        fi
+        if [ -z "$GRAFANA_DASHBOARDS_KEY" ]; then
+          echo "Api key stored in \$GRAFANA_DASHBOARDS_KEY is required!"
+          exit 1
+        fi
+        if [ -z "$GRAFANA_DASHBOARDS_HOST" ]; then
+          echo "Host stored in \$GRAFANA_DASHBOARDS_HOST is required!"
+          exit 1
+        fi
+  - when:
+      condition: <<parameters.autoupdate>>
+      steps:
+        - update_local:
+            dashboard-name: <<parameters.dashboard-name>>
+            dashboard-path: <<parameters.dashboard-path>>
+  - check_remote:
+      dashboard-name: <<parameters.dashboard-name>>
+      dashboard-path: <<parameters.dashboard-path>>
+  - when:
+      condition:
+        equal: [ 1, "$NEW_VERSION" ]
+      steps:
+        - upload:
+            dashboard-name: <<parameters.dashboard-name>>
+            dashboard-path: <<parameters.dashboard-path>>
+            folder-uid: <<parameters.folder-uid>>
+            overwrite-existing: <<parameters.overwrite-existing>>

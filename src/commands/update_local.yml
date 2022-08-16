@@ -1,0 +1,45 @@
+description: Checks if the local jsonnet file has dependencies with updates, and updates the generated dashboard
+parameters:
+  dashboard-name:
+    type: string
+    default: dashboard
+    description: |
+      Name of the json(net) dashboard file. It is assumed that they share the same name.
+      Defaults to 'dashboard'.
+  dashboard-path:
+    type: string
+    default: monitoring
+    description: |
+      Specify the path to where json dashboard is available. Omit any trailing /.
+      Defaults to 'monitoring'.
+steps:
+  - run:
+      name: Install dependencies
+      command: |
+        go install github.com/google/go-jsonnet/cmd/jsonnet@latest
+        go install github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb@latest
+  - run:
+      name: Update local dashboard
+      working_directory: <<parameters.dashboard-path>>
+      command: |
+        jb install && jb update
+
+        echo "Generating dashboard based on newest versions"
+        jsonnet -J ./vendor <<parameters.dashboard-name>>.jsonnet | jq . > dashboard_cci.json
+
+        # Exit status is 0 if inputs are the same, 1 if different, 2 if trouble.
+        DIFF="$(! diff dashboard_cci.json <<parameters.dashboard-name>>.json || :)"
+        DASH_DIFF=$?
+        echo "Diff: $DIFF"
+
+        if [ "$DASH_DIFF" == 1 ]; then
+          git config --global user.email "circleci@entur.org"
+          git config --global user.name "EnturCircleCi"
+
+          echo "Renaming dashboard_cci.json to <<parameters.dashboard-name>>.json"
+          mv dashboard_cci.json <<parameters.dashboard-name>>.json
+          git add *.json* && git commit -m "[skip ci] Updated generated dashboard due to library changes"
+          echo "Committed changed files"
+        else
+          echo "No library updates"
+        fi
