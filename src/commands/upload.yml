@@ -27,10 +27,12 @@ steps:
       name: Update remote dashboard
       working_directory: <<parameters.dashboard-path>>
       command: |
+        GIT_COMMIT_DESC="$(git log --format=oneline -n 1 $CIRCLE_SHA1)"
         BODY="{
               \"dashboard\": $(jq . <<parameters.dashboard-name>>.json),
               \"folderUid\": \"<<parameters.folder-uid>>\",
-              \"overwrite\": <<parameters.overwrite-existing>>
+              \"overwrite\": <<parameters.overwrite-existing>>,
+              \"message\": \"$GIT_COMMIT_DESC\"
         }"
         curl $GRAFANA_DASHBOARDS_HOST/api/dashboards/db -d "$BODY" \
               -H "Authorization: Bearer $GRAFANA_DASHBOARDS_KEY" \
