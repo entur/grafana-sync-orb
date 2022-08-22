@@ -1,4 +1,4 @@
-description: Checks whether the local and remote dashboards are equal. Exports 'NEW_VERSION' to env
+description: Checks whether the local and remote dashboards are equal. Exports 'IS_UPDATED' to env
 parameters:
   dashboard-name:
     type: string
@@ -34,8 +34,8 @@ steps:
           DASH_DIFF=$?
           echo "Diff: $DIFF"
 
-          echo "export NEW_VERSION=\"$DASH_DIFF\"" >> $BASH_ENV
+          echo "export IS_UPDATED=\"$DASH_DIFF\"" >> $BASH_ENV
         else
           echo "No previous version found. Proceeding to upload"
-          echo "export NEW_VERSION=0" >> $BASH_ENV
+          echo "export IS_UPDATED=0" >> $BASH_ENV
         fi
