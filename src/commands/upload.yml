@@ -16,12 +16,6 @@ parameters:
     description: |
       Folder uid from Grafana.
       Uid can be taken from 'HOST/dashboards/f/{UID}'
-  overwrite-existing:
-    type: boolean
-    default: true
-    description: |
-      Whether to overwrite existing dashboard matching name/uid.
-      Defaults to 'true'.
 steps:
   - run:
       name: Update remote dashboard
@@ -31,7 +25,7 @@ steps:
         BODY="{
               \"dashboard\": $(jq . <<parameters.dashboard-name>>.json),
               \"folderUid\": \"<<parameters.folder-uid>>\",
-              \"overwrite\": <<parameters.overwrite-existing>>,
+              \"overwrite\": true,
               \"message\": \"$GIT_COMMIT_DESC\"
         }"
         curl $GRAFANA_DASHBOARDS_HOST/api/dashboards/db -d "$BODY" \

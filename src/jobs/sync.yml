@@ -23,12 +23,6 @@ parameters:
     description: |
       Folder uid from Grafana.
       Uid can be taken from 'HOST/dashboards/f/{UID}'
-  overwrite-existing:
-    type: boolean
-    default: true
-    description: |
-      Whether to overwrite existing dashboard matching name/uid.
-      Defaults to 'true'.
   autoupdate:
     type: boolean
     default: true
@@ -77,4 +71,3 @@ steps:
             dashboard-name: <<parameters.dashboard-name>>
             dashboard-path: <<parameters.dashboard-path>>
             folder-uid: <<parameters.folder-uid>>
-            overwrite-existing: <<parameters.overwrite-existing>>
