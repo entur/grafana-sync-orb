@@ -38,7 +38,7 @@ steps:
 
           echo "Renaming dashboard_cci.json to <<parameters.dashboard-name>>.json"
           mv dashboard_cci.json <<parameters.dashboard-name>>.json
-          git add *.json* && git commit -m "[skip ci] Updated generated dashboard due to library changes"
+          git add ./*.json* && git commit -m "[skip ci] Updated generated dashboard due to library changes"
           echo "Committed changed files"
         else
           echo "No library updates"
