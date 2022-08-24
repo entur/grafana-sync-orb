@@ -32,7 +32,7 @@ steps:
         DASH_DIFF=$?
         echo "Diff: $DIFF"
 
-        if [ "$DASH_DIFF" == 1 ]; then
+        if [ -n "$DASH_DIFF" ]; then
           git config --global user.email "circleci@entur.org"
           git config --global user.name "EnturCircleCi"
 

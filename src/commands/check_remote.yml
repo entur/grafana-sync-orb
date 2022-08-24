@@ -37,5 +37,5 @@ steps:
           echo "export IS_UPDATED=\"$DASH_DIFF\"" >> $BASH_ENV
         else
           echo "No previous version found. Proceeding to upload"
-          echo "export IS_UPDATED=0" >> $BASH_ENV
+          echo "export IS_UPDATED=1" >> $BASH_ENV
         fi
