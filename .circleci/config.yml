@@ -16,7 +16,7 @@ workflows:
           context: global
           filters:
             branches:
-              ignore: master
+              ignore: main
           checkout: false
           attach-workspace: true
           orb-ref: entur/grafana-sync-orb@dev:$CIRCLE_BRANCH
@@ -27,7 +27,7 @@ workflows:
           context: global
           filters:
             branches:
-              only: master
+              only: main
           checkout: false
           attach-workspace: true
           orb-ref: entur/grafana-sync-orb
