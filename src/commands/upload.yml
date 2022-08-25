@@ -16,16 +16,13 @@ parameters:
     description: |
       Folder uid from Grafana.
       Uid can be taken from 'HOST/dashboards/f/{UID}'
-  is-update:
-    type: env_var_name
-    default: IS_UPDATE
 steps:
   - run:
       name: Update remote dashboard
       working_directory: <<parameters.dashboard-path>>
       command: |
-        echo "${<<parameters.is-update>>}"
-        if [[ "1" == "${<<parameters.is-update>>}" ]]; then
+        echo "$IS_UPDATE"
+        if [[ "1" == "$IS_UPDATE" ]]; then
           echo "Updating remote dashboard"
 
           GIT_COMMIT_DESC="$(git log --format=oneline -n 1 $CIRCLE_SHA1)"
