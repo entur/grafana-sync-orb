@@ -21,7 +21,9 @@ steps:
       name: Update remote dashboard
       working_directory: <<parameters.dashboard-path>>
       command: |
-        if [ 1 == "$IS_UPDATE" ]; then
+        if [[ "1" == "$IS_UPDATE" ]]; then
+          echo "Updating remote dashboard"
+
           GIT_COMMIT_DESC="$(git log --format=oneline -n 1 $CIRCLE_SHA1)"
           BODY="{
                 \"dashboard\": $(jq . <<parameters.dashboard-name>>.json),
@@ -29,8 +31,8 @@ steps:
                 \"overwrite\": true,
                 \"message\": \"$GIT_COMMIT_DESC\"
           }"
-          curl $GRAFANA_DASHBOARDS_HOST/api/dashboards/db -d "$BODY" \
+          echo $(curl $GRAFANA_DASHBOARDS_HOST/api/dashboards/db -d "$BODY" \
                 -H "Authorization: Bearer $GRAFANA_DASHBOARDS_KEY" \
-                -H "Content-type: application/json"
+                -H "Content-type: application/json")
           exit $?
         fi
