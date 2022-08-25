@@ -63,11 +63,7 @@ steps:
   - check_remote:
       dashboard-name: <<parameters.dashboard-name>>
       dashboard-path: <<parameters.dashboard-path>>
-  - when:
-      condition:
-        equal: [ 1, $IS_UPDATED ]
-      steps:
-        - upload:
-            dashboard-name: <<parameters.dashboard-name>>
-            dashboard-path: <<parameters.dashboard-path>>
-            folder-uid: <<parameters.folder-uid>>
+  - upload:
+      dashboard-name: <<parameters.dashboard-name>>
+      dashboard-path: <<parameters.dashboard-path>>
+      folder-uid: <<parameters.folder-uid>>

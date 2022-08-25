@@ -21,14 +21,16 @@ steps:
       name: Update remote dashboard
       working_directory: <<parameters.dashboard-path>>
       command: |
-        GIT_COMMIT_DESC="$(git log --format=oneline -n 1 $CIRCLE_SHA1)"
-        BODY="{
-              \"dashboard\": $(jq . <<parameters.dashboard-name>>.json),
-              \"folderUid\": \"<<parameters.folder-uid>>\",
-              \"overwrite\": true,
-              \"message\": \"$GIT_COMMIT_DESC\"
-        }"
-        curl $GRAFANA_DASHBOARDS_HOST/api/dashboards/db -d "$BODY" \
-              -H "Authorization: Bearer $GRAFANA_DASHBOARDS_KEY" \
-              -H "Content-type: application/json"
-        exit $?
+        [ 1 == "$IS_UPDATE" ]; then
+          GIT_COMMIT_DESC="$(git log --format=oneline -n 1 $CIRCLE_SHA1)"
+          BODY="{
+                \"dashboard\": $(jq . <<parameters.dashboard-name>>.json),
+                \"folderUid\": \"<<parameters.folder-uid>>\",
+                \"overwrite\": true,
+                \"message\": \"$GIT_COMMIT_DESC\"
+          }"
+          curl $GRAFANA_DASHBOARDS_HOST/api/dashboards/db -d "$BODY" \
+                -H "Authorization: Bearer $GRAFANA_DASHBOARDS_KEY" \
+                -H "Content-type: application/json"
+          exit $?
+        fi
