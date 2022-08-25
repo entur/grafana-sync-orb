@@ -24,7 +24,8 @@ steps:
       name: Update remote dashboard
       working_directory: <<parameters.dashboard-path>>
       command: |
-        if [[ "1" == <<parameters.is-update>> ]]; then
+        echo "${<<parameters.is-update>>}"
+        if [[ "1" == "${<<parameters.is-update>>}" ]]; then
           echo "Updating remote dashboard"
 
           GIT_COMMIT_DESC="$(git log --format=oneline -n 1 $CIRCLE_SHA1)"
