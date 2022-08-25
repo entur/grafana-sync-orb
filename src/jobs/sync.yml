@@ -63,9 +63,10 @@ steps:
   - check_remote:
       dashboard-name: <<parameters.dashboard-name>>
       dashboard-path: <<parameters.dashboard-path>>
+  - run: echo "$IS_UPDATED"
   - when:
       condition:
-        equal: [ 1, "$IS_UPDATED" ]
+        equal: [ "1", "$IS_UPDATED" ]
       steps:
         - upload:
             dashboard-name: <<parameters.dashboard-name>>
