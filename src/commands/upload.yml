@@ -21,7 +21,7 @@ steps:
       name: Update remote dashboard
       working_directory: <<parameters.dashboard-path>>
       command: |
-        [ 1 == "$IS_UPDATE" ]; then
+        if [ 1 == "$IS_UPDATE" ]; then
           GIT_COMMIT_DESC="$(git log --format=oneline -n 1 $CIRCLE_SHA1)"
           BODY="{
                 \"dashboard\": $(jq . <<parameters.dashboard-name>>.json),
