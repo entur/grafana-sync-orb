@@ -67,4 +67,3 @@ steps:
       dashboard-name: <<parameters.dashboard-name>>
       dashboard-path: <<parameters.dashboard-path>>
       folder-uid: <<parameters.folder-uid>>
-      is-update: "$IS_UPDATE"
