@@ -1,0 +1,33 @@
+description: Checks whether the local and remote dashboards are equal. Updates the remote if they differ
+parameters:
+  dashboard-name:
+    type: string
+    default: dashboard
+    description: |
+      Name of the json(net) dashboard file. It is assumed that they share the same name.
+      Defaults to 'dashboard'.
+  dashboard-path:
+    type: string
+    default: monitoring
+    description: |
+      Specify the path to where json dashboard is available. Omit any trailing /.
+      Defaults to 'monitoring'.
+  folder-uid:
+    type: string
+    description: |
+      Folder uid from Grafana.
+      Uid can be taken from 'HOST/dashboards/f/{UID}'
+steps:
+  - run:
+      name: Check if remote and local dashboards differs
+      working_directory: <<parameters.dashboard-path>>
+      command: <<include(scripts/check_remote.sh)>>
+      environment:
+        DASHBOARD_NAME: <<parameters.dashboard-name>>
+  - run:
+      name: Update remote dashboard
+      working_directory: <<parameters.dashboard-path>>
+      command: <<include(scripts/upload.sh)>>
+      environment:
+        DASHBOARD_NAME: <<parameters.dashboard-name>>
+        FOLDER_UID: <<parameters.folder-uid>>

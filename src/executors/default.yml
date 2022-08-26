@@ -1,3 +1,4 @@
+description: Default go image
 docker:
   - image: cimg/go:1.19.0
     auth:

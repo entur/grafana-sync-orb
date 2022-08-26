@@ -1,7 +1,15 @@
 version: 2.1
 
 orbs:
-  orb-tools: circleci/orb-tools@10.0.1
+  orb-tools: circleci/orb-tools@11.2.0
+  shellcheck: circleci/shellcheck@3.1.1
+
+aliases:
+  - &common-config
+    context: global
+    orb-name: entur/grafana-sync-orb
+    vcs-type: github
+    enable-pr-comment: false
 
 workflows:
   verify:
@@ -11,26 +19,28 @@ workflows:
       - orb-tools/pack:
           name: pack
           source-dir: src
+      - orb-tools/review:
+          name: review
+      - shellcheck/check:
+          name: shellcheck
+          dir: src/scripts
       - orb-tools/publish:
           name: publish
-          context: global
+          <<: *common-config
           filters:
             branches:
               ignore: main
-          checkout: false
-          attach-workspace: true
-          orb-ref: entur/grafana-sync-orb@dev:$CIRCLE_BRANCH
           requires:
             - pack
-      - orb-tools/increment:
+      - orb-tools/publish:
           name: release
-          context: global
+          <<: *common-config
           filters:
             branches:
               only: main
-          checkout: false
-          attach-workspace: true
-          orb-ref: entur/grafana-sync-orb
+          pub-type: production
           requires:
             - lint
             - pack
+            - review
+            - shellcheck

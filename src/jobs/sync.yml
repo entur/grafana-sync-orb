@@ -36,34 +36,18 @@ steps:
       at: "."
   - run:
       name: Validate input
-      command: |
-        echo "Verifying input"
-        if [ ! -s "<<parameters.dashboard-path>>/<<parameters.dashboard-name>>.json" ]; then
-          echo "File <<parameters.dashboard-path>>/<<parameters.dashboard-name>>.json does not exist or was empty"
-          exit 1
-        fi
-        if [ -z "<<parameters.folder-uid>>" ]; then
-          echo "Folder uid is required!"
-          exit 1
-        fi
-        if [ -z "$GRAFANA_DASHBOARDS_KEY" ]; then
-          echo "Api key stored in \$GRAFANA_DASHBOARDS_KEY is required!"
-          exit 1
-        fi
-        if [ -z "$GRAFANA_DASHBOARDS_HOST" ]; then
-          echo "Host stored in \$GRAFANA_DASHBOARDS_HOST is required!"
-          exit 1
-        fi
+      command: <<include(scripts/validate.sh)>>
+      environment:
+        DASHBOARD_PATH: <<parameters.dashboard-path>>
+        DASHBOARD_NAME: <<parameters.dashboard-name>>
+        FOLDER_UID: <<parameters.folder-uid>>
   - when:
       condition: <<parameters.autoupdate>>
       steps:
         - update_local:
             dashboard-name: <<parameters.dashboard-name>>
             dashboard-path: <<parameters.dashboard-path>>
-  - check_remote:
-      dashboard-name: <<parameters.dashboard-name>>
-      dashboard-path: <<parameters.dashboard-path>>
-  - upload:
+  - update_remote:
       dashboard-name: <<parameters.dashboard-name>>
       dashboard-path: <<parameters.dashboard-path>>
       folder-uid: <<parameters.folder-uid>>
