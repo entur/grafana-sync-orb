@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  orb-tools: circleci/orb-tools@11.2.0
+  orb-tools: circleci/orb-tools@11.3.0
   shellcheck: circleci/shellcheck@3.1.1
 
 aliases:
@@ -10,6 +10,12 @@ aliases:
     orb-name: entur/grafana-sync-orb
     vcs-type: github
     enable-pr-comment: false
+
+jobs:
+  get-tag:
+    executor: orb-tools/default
+    steps:
+      - run: echo "export CIRCLE_TAG=$(git describe --tags --abbrev=0 HEAD)" >> "$BASH_ENV"
 
 workflows:
   verify:
@@ -32,15 +38,17 @@ workflows:
               ignore: main
           requires:
             - pack
+      - get-tag
       - orb-tools/publish:
           name: release
           <<: *common-config
           filters:
-            tags:
-              only: /^v.*/
+            branches:
+              only: main
           pub-type: production
           requires:
             - lint
             - pack
             - review
             - shellcheck
+            - get-tag
