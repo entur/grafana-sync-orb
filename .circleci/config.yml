@@ -15,6 +15,7 @@ jobs:
   get-tag:
     executor: orb-tools/default
     steps:
+      - checkout
       - run: echo "export CIRCLE_TAG=$(git describe --tags --abbrev=0 HEAD)" >> "$BASH_ENV"
 
 workflows:
