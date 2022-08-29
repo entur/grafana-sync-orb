@@ -36,8 +36,8 @@ workflows:
           name: release
           <<: *common-config
           filters:
-            branches:
-              only: main
+            tags:
+              only: /^v.*/
           pub-type: production
           requires:
             - lint
