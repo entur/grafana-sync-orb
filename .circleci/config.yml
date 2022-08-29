@@ -16,7 +16,10 @@ jobs:
     executor: orb-tools/default
     steps:
       - checkout
-      - run: echo "export CIRCLE_TAG=$(git describe --tags --abbrev=0 HEAD)" >> "$BASH_ENV"
+      - run: |
+          LATEST_TAG="$(git describe --tags --abbrev=0 HEAD)"
+          echo "Latest tag: $LATEST_TAG"
+          echo "export CIRCLE_TAG=\"$LATEST_TAG\"" >> "$BASH_ENV"
 
 workflows:
   verify:
