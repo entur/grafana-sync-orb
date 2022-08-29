@@ -11,6 +11,13 @@ aliases:
     vcs-type: github
     enable-pr-comment: false
 
+  - &deploy-filter
+    filters:
+      branches:
+        ignore: /.*/
+      tags:
+        only: /^v.*/
+
 jobs:
   get-tag:
     executor: orb-tools/default
@@ -42,17 +49,29 @@ workflows:
               ignore: main
           requires:
             - pack
-      - get-tag
+
+  publish:
+    jobs:
+      - orb-tools/lint:
+          name: lint
+          <<: *deploy-filter
+      - orb-tools/pack:
+          name: pack
+          source-dir: src
+          <<: *deploy-filter
+      - orb-tools/review:
+          name: review
+          <<: *deploy-filter
+      - shellcheck/check:
+          name: shellcheck
+          dir: src/scripts
+          <<: *deploy-filter
       - orb-tools/publish:
           name: release
           <<: *common-config
-          filters:
-            branches:
-              only: main
           pub-type: production
           requires:
             - lint
             - pack
             - review
             - shellcheck
-            - get-tag
