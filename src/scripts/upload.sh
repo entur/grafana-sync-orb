@@ -2,7 +2,7 @@
 
 echo "$IS_UPDATED"
 
-if [[ "1" == "$IS_UPDATED" ]]; then
+if [[ "0" == "$IS_UPDATED" ]]; then
   echo "Updating remote dashboard"
 
   GIT_COMMIT_DESC="$(git log --format=oneline -n 1 "$CIRCLE_SHA1")"

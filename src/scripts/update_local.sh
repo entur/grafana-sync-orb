@@ -5,12 +5,10 @@ jb install && jb update
 echo "Generating dashboard based on newest versions"
 jsonnet -J ./vendor "$DASHBOARD_NAME".jsonnet | jq . > dashboard_cci.json
 
-# Exit status is 0 if inputs are the same, 1 if different, 2 if trouble.
-DIFF="$(! diff dashboard_cci.json "$DASHBOARD_NAME".json || :)"
-DASH_DIFF=$?
+DIFF="$(! diff -w dashboard_cci.json "$DASHBOARD_NAME".json || :)"
 echo "Diff: $DIFF"
 
-if [ -n "$DASH_DIFF" ]; then
+if [ -n "$DIFF" ]; then
   git config --global user.email "circleci@entur.org"
   git config --global user.name "EnturCircleCi"
 

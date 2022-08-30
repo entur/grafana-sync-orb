@@ -17,13 +17,11 @@ if [ "$HTTP_CODE" == "200" ]; then
   echo "Previous version found. Checking for differences"
   < tmp.json jq -r ".dashboard" > dashboard_external.json
 
-  # Exit status is 0 if inputs are the same, 1 if different, 2 if trouble.
   DIFF="$(! diff -w -I "version" -I "id" dashboard_external.json "$DASHBOARD_NAME".json || :)"
-  DASH_DIFF=$?
   echo "Diff: $DIFF"
 
-  echo "export IS_UPDATED=\"$DASH_DIFF\"" >> "$BASH_ENV"
+  echo "export IS_UPDATED=\"$([[ -n "$DIFF" ]])\"" >> "$BASH_ENV"
 else
   echo "No previous version found. Proceeding to upload"
-  echo "export IS_UPDATED=\"1\"" >> "$BASH_ENV"
+  echo "export IS_UPDATED=\"0\"" >> "$BASH_ENV"
 fi
