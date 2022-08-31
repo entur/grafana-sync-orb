@@ -24,3 +24,5 @@ steps:
         DASHBOARD_NAME: <<parameters.dashboard-name>>
   - persist_to_workspace:
       root: "."
+      paths:
+        - "*"
