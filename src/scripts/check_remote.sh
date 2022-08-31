@@ -20,8 +20,14 @@ if [ "$HTTP_CODE" == "200" ]; then
   DIFF="$(! diff -w -I "version" -I "id" dashboard_external.json "$DASHBOARD_NAME".json || :)"
   echo "Diff: $DIFF"
 
-  echo "export IS_UPDATED=\"$([[ -n "$DIFF" ]])\"" >> "$BASH_ENV"
+  if [ -n "$DIFF" ]; then
+    echo "New version differs. Proceeding to upload."
+    echo "export IS_UPDATED=\"0\"" >> "$BASH_ENV"
+  else
+    echo "New version is the same. No update needed."
+    echo "export IS_UPDATED=\"1\"" >> "$BASH_ENV"
+  fi
 else
-  echo "No previous version found. Proceeding to upload"
+  echo "No previous version found. Proceeding to upload."
   echo "export IS_UPDATED=\"0\"" >> "$BASH_ENV"
 fi
