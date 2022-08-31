@@ -22,3 +22,5 @@ steps:
       command: <<include(scripts/update_local.sh)>>
       environment:
         DASHBOARD_NAME: <<parameters.dashboard-name>>
+  - persist_to_workspace:
+      root: "."

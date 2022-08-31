@@ -15,7 +15,7 @@ HTTP_CODE=$(curl "$GRAFANA_DASHBOARDS_HOST/api/dashboards/uid/$DASH_UID" \
 
 if [ "$HTTP_CODE" == "200" ]; then
   echo "Previous version found. Checking for differences"
-  < tmp.json jq -r ".dashboard" > dashboard_external.json
+  < tmp.json jq . | jq -r ".dashboard" > dashboard_external.json
 
   DIFF="$(! diff -w -I "version" -I "id" dashboard_external.json "$DASHBOARD_NAME".json || :)"
   echo "Diff: $DIFF"

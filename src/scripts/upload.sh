@@ -5,7 +5,7 @@ echo "$IS_UPDATED"
 if [[ "0" == "$IS_UPDATED" ]]; then
   echo "Updating remote dashboard"
 
-  GIT_COMMIT_DESC="$(git log --format=oneline -n 1 "$CIRCLE_SHA1")"
+  GIT_COMMIT_DESC="$(git log --format=oneline -n 1)"
   BODY="{
         \"dashboard\": $(jq . "$DASHBOARD_NAME".json),
         \"folderUid\": \"$FOLDER_UID\",
